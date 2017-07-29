@@ -1,39 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="app">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Ya</title>
 </head>
-<body>
+<body ng-controller="AppController as $ctrl">
     <form action="">
         <div class="row">
             <label for="fio">ФИО</label>
 
-            <input type="text" name="fio">
+            <input type="text" name="fio" ng-model="$ctrl.form.fio">
         </div>        
 
         <div class="row">
             <label for="email">Email</label>
         
-            <input type="text" name="email">
+            <input type="text" name="email" ng-model="$ctrl.form.email">
         </div>        
 
         <div class="row">
             <label for="phone">Телефон</label>
         
-            <input type="text" name="phone">
-        </div>
-        
-        <div class="row">
-            <button id="submitButton">Отправить</button>
+            <input type="text" name="phone" ng-model="$ctrl.form.phone">
         </div>
     </form>
-
+    
+    <div class="row">
+        <button id="submitButton" ng-click="$ctrl.form.submit()">Отправить</button>
+    </div>
+    
     <!--scripts-->
 
-    <script> src="index.js"</script>
+    <script src="node_modules/angular/angular.min.js"></script>
 
+    <script src="index.js"></script>
 </body>
 </html>
