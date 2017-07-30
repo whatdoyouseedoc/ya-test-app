@@ -1,0 +1,14 @@
+.form .row {
+  margin: 20px;
+}
+.form .row label {
+  min-width: 100px;
+  display: block;
+  float: left;
+}
+.form .row input {
+  min-width: 200px;
+}
+.form .row input.error {
+  border: 1px solid red;
+}

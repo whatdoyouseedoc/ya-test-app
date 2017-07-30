@@ -4,6 +4,14 @@
     app.controller('AppController', ['$scope', '$log', function($scope, $log) {
         var ctrl = this;
 
+        ctrl.formValidStatus = {
+            fio: true,
+
+            email: true,
+
+            phone: true
+        };
+
         ctrl.validate = {
             fio: function(fio) {
                 var re =  new RegExp('[А-ЯЁа-яёA-Za-z]+ [А-ЯЁа-яёA-Za-z]+ [А-ЯЁа-яёA-Za-z]+');
@@ -23,7 +31,7 @@
                      'yandex.com'
                 ];
 
-                var rePattern = '[A-Za-z0-9._%+-]+';
+                var rePattern = '[A-Za-z0-9._%+-]+@';
 
                 try {
                     appropriateDomains.forEach(function(domain) {
@@ -54,7 +62,19 @@
 
                     return sum < 30;
                 }
+            },
+
+            all: function() {
+                ctrl.formValidStatus.fio = this.fio(ctrl.form.fio);
+
+                ctrl.formValidStatus.email = this.email(ctrl.form.email);
+
+                ctrl.formValidStatus.phone = this.phone(ctrl.form.phone);
             }
+        };
+
+        ctrl.displayErrors = function(formValidStatus) {
+
         };
 
         ctrl.form = {
@@ -66,6 +86,8 @@
 
             submit: function() {
                 $log.debug('Form has been submited.');
+
+                ctrl.validate.all();
             }
         };
     }]);

@@ -1,0 +1,27 @@
+{
+  "name": "ya-test-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "angular": "~1.6.x"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-less": "^3.3.2",
+    "path": "^0.12.7"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whatdoyouseedoc/ya-test-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/whatdoyouseedoc/ya-test-app/issues"
+  },
+  "homepage": "https://github.com/whatdoyouseedoc/ya-test-app#readme"
+}

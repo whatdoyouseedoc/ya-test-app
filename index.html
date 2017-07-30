@@ -1,34 +1,39 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="app">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="<U></U>TF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="style.css">
     <title>Ya</title>
 </head>
 <body ng-controller="AppController as $ctrl">
-    <form action="">
+    <form action="" class="form">
         <div class="row">
             <label for="fio">ФИО</label>
 
-            <input type="text" name="fio" ng-model="$ctrl.form.fio">
+            <input type="text" name="fio" id="fio" ng-model="$ctrl.form.fio" ng-class="{'error': !$ctrl.formValidStatus.fio}">
         </div>        
 
         <div class="row">
             <label for="email">Email</label>
         
-            <input type="text" name="email" ng-model="$ctrl.form.email">
+            <input type="text" name="email" id="email" ng-model="$ctrl.form.email"  ng-class="{'error': !$ctrl.formValidStatus.email}">
         </div>        
 
         <div class="row">
             <label for="phone">Телефон</label>
         
-            <input type="text" name="phone" ng-model="$ctrl.form.phone">
+            <input type="text" name="phone" id="phone" ng-model="$ctrl.form.phone"  ng-class="{'error': !$ctrl.formValidStatus.phone}">
         </div>
     </form>
     
     <div class="row">
         <button id="submitButton" ng-click="$ctrl.form.submit()">Отправить</button>
+    </div>
+
+    <div id="resultContainer">
+        <pre>{{ $ctrl.formValidStatus | json }}</pre>
     </div>
     
     <!--scripts-->
