@@ -8,7 +8,7 @@
     <title>Ya</title>
 </head>
 <body ng-controller="AppController as $ctrl">
-    <form action="{{ $ctrl.actionPath }}" class="form" ng-submit="$ctrl.form.submit($event)">
+    <form action="{{ $ctrl.rest }}" class="form" ng-submit="$ctrl.form.submit($event)">
         <div class="row">
             <label for="fio">ФИО</label>
 
@@ -33,7 +33,7 @@
     </form>
 
     <div id="resultContainer">
-        <pre>{{ $ctrl.formValidStatus | json }}</pre>
+        <!-- <pre>{{ $ctrl.formValidStatus | json }}</pre> -->
     </div>
     
     <!--scripts-->

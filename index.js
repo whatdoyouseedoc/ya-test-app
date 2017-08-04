@@ -1,10 +1,23 @@
 (function() {
     var app = angular.module('app', []);
 
-    app.controller('AppController', ['$scope', '$log', '$http', '$q', function($scope, $log, $http, $q) {
+    app.controller('AppController', ['$scope', '$log', '$http', '$q', '$sce', function($scope, $log, $http, $q, $sce) {
         var ctrl = this;
 
-        ctrl.actionPath = 'response-mocks/success.json';
+        var resultContainer = angular.element(document.getElementById('resultContainer'));
+
+        var restMockArray = [
+            'response-mocks/success.json',
+            'response-mocks/error.json',
+            'response-mocks/progress.json'
+        ];
+
+        ctrl.restMock = '';
+
+        ctrl.randomRestMock = function() {
+            // return random response mock
+            return restMockArray[Math.floor(Math.random() * 3)];
+        };
 
         ctrl.formValidStatus = {
             fio: true,
@@ -13,7 +26,7 @@
 
             phone: true,
 
-            isPassed: function() {
+            valid: function() {
                 return this.fio && this.email && this.phone;
             }
         };
@@ -79,6 +92,36 @@
             }
         };
 
+        var getRequest = function() {
+            // $log.debug('Rest is: ', rest);
+
+            ctrl.restMock = ctrl.randomRestMock();
+            
+            $http.get(ctrl.restMock).then(function(res) {
+                if (res.data.status == 'success') {
+                    resultContainer.addClass('success');
+
+                    resultContainer.html('Success');
+                }
+
+                if (res.data.status == 'error') {
+                    resultContainer.addClass('success');
+
+                    resultContainer.html(res.data.reason);
+                }
+
+                if (res.data.status == 'progress') {
+                    resultContainer.addClass('progress');
+
+                    setTimeout(function() {
+                        getRequest();
+                    }, res.data.timeout);
+                }
+            }, function(error) {
+                return $q.reject(error);
+            });
+        };
+
         ctrl.form = {
             fio: 'Alex Alex Alex',
 
@@ -93,20 +136,14 @@
 
                 ctrl.validate.all();
 
-                if (!ctrl.formValidStatus.isPassed()) {
+                if (!ctrl.formValidStatus.valid()) {
                     $log.debug('Validation did not passed.');
 
                     return;
                 } else {
                     $log.debug('Validation passed.');
 
-                    $log.debug('Path: ', ctrl.actionPath);
-
-                    $http.get(ctrl.actionPath).then(function(res) {
-                        $log.debug('Data: ', res.data);
-                    }, function(error) {
-                        return $q.reject(error);
-                    });
+                    getRequest();
                 }
             }
         };
