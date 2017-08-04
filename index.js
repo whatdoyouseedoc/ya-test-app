@@ -1,15 +1,21 @@
 (function() {
     var app = angular.module('app', []);
 
-    app.controller('AppController', ['$scope', '$log', function($scope, $log) {
+    app.controller('AppController', ['$scope', '$log', '$http', '$q', function($scope, $log, $http, $q) {
         var ctrl = this;
+
+        ctrl.actionPath = 'response-mocks/success.json';
 
         ctrl.formValidStatus = {
             fio: true,
 
             email: true,
 
-            phone: true
+            phone: true,
+
+            isPassed: function() {
+                return this.fio && this.email && this.phone;
+            }
         };
 
         ctrl.validate = {
@@ -73,21 +79,35 @@
             }
         };
 
-        ctrl.displayErrors = function(formValidStatus) {
-
-        };
-
         ctrl.form = {
-            fio: null,
+            fio: 'Alex Alex Alex',
 
-            email: null,
+            email: 'ya@ya.ru',
 
-            phone: null,
+            phone: '+7(211)212-12-12',
 
-            submit: function() {
+            submit: function(e) {
+                e.preventDefault();
+                
                 $log.debug('Form has been submited.');
 
                 ctrl.validate.all();
+
+                if (!ctrl.formValidStatus.isPassed()) {
+                    $log.debug('Validation did not passed.');
+
+                    return;
+                } else {
+                    $log.debug('Validation passed.');
+
+                    $log.debug('Path: ', ctrl.actionPath);
+
+                    $http.get(ctrl.actionPath).then(function(res) {
+                        $log.debug('Data: ', res.data);
+                    }, function(error) {
+                        return $q.reject(error);
+                    });
+                }
             }
         };
     }]);

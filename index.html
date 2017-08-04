@@ -8,7 +8,7 @@
     <title>Ya</title>
 </head>
 <body ng-controller="AppController as $ctrl">
-    <form action="" class="form">
+    <form action="{{ $ctrl.actionPath }}" class="form" ng-submit="$ctrl.form.submit($event)">
         <div class="row">
             <label for="fio">ФИО</label>
 
@@ -26,11 +26,11 @@
         
             <input type="text" name="phone" id="phone" ng-model="$ctrl.form.phone"  ng-class="{'error': !$ctrl.formValidStatus.phone}">
         </div>
+
+        <div class="row">
+            <button id="submitButton">Отправить</button>
+        </div>
     </form>
-    
-    <div class="row">
-        <button id="submitButton" ng-click="$ctrl.form.submit()">Отправить</button>
-    </div>
 
     <div id="resultContainer">
         <pre>{{ $ctrl.formValidStatus | json }}</pre>
