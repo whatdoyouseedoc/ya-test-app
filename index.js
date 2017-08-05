@@ -1,20 +1,23 @@
 (function() {
     var app = angular.module('app', []);
 
-    app.controller('AppController', ['$scope', '$log', '$http', '$q', '$sce', function($scope, $log, $http, $q, $sce) {
+    app.controller('AppController', ['$log', '$http', '$q', function($log, $http, $q) {
         var ctrl = this;
 
         var resultContainer = angular.element(document.getElementById('resultContainer'));
 
         var restMockArray = [
             'response-mocks/success.json',
+            
             'response-mocks/error.json',
+            
             'response-mocks/progress.json'
         ];
 
         ctrl.restMock = '';
 
         ctrl.randomRestMock = function() {
+
             // return random response mock
             return restMockArray[Math.floor(Math.random() * 3)];
         };
@@ -27,7 +30,9 @@
             phone: true,
 
             valid: function() {
-                return this.fio && this.email && this.phone;
+                return this.fio
+                    && this.email
+                    && this.phone;
             }
         };
 
@@ -43,10 +48,15 @@
 
                 var appropriateDomains = [
                      'ya.ru',
+                     
                      'yandex.ru',
+                     
                      'yandex.ua',
+                     
                      'yandex.by',
+                     
                      'yandex.kz',
+                     
                      'yandex.com'
                 ];
 
@@ -112,6 +122,8 @@
 
                 if (res.data.status == 'progress') {
                     resultContainer.addClass('progress');
+
+                    resultContainer.html('');
 
                     setTimeout(function() {
                         getRequest();
