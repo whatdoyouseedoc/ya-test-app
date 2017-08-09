@@ -1,151 +1,152 @@
-(function() {
-    var app = angular.module('app', []);
+var MyForm = {
+    // validate() => { isValid: Boolean, errorFields: String[] }
+    // getData() => Object
+    // setData(Object) => undefined
+    // submit() => undefined
+};
 
-    app.controller('AppController', ['$scope', '$log', '$http', '$q', '$sce', function($scope, $log, $http, $q, $sce) {
-        var ctrl = this;
+var app = angular.module('app', []);
 
-        var resultContainer = angular.element(document.getElementById('resultContainer'));
+app.controller('AppController', ['$scope', '$log', '$http', '$q', function($scope, $log, $http, $q) {
+    var ctrl = this;
 
-        var restMockArray = [
-            'response-mocks/success.json',
-            'response-mocks/error.json',
-            'response-mocks/progress.json'
-        ];
+    MyForm = ctrl.test;
 
-        ctrl.restMock = '';
+    var resultContainer = angular.element(document.getElementById('resultContainer'));
 
-        ctrl.randomRestMock = function() {
-            // return random response mock
-            return restMockArray[Math.floor(Math.random() * 3)];
-        };
+    var restMockArray = [
+        'response-mocks/success.json',
+        
+        'response-mocks/error.json',
+        
+        'response-mocks/progress.json'
+    ];
 
-        ctrl.formValidStatus = {
-            fio: true,
+    ctrl.restMock = '';
 
-            email: true,
+    ctrl.randomRestMock = function() {
 
-            phone: true,
+        // return random response mock
+        return restMockArray[Math.floor(Math.random() * 3)];
+    };
 
-            valid: function() {
-                return this.fio && this.email && this.phone;
-            }
-        };
+    ctrl.formValidStatus = {
+        fio: true,
 
-        ctrl.validate = {
-            fio: function(fio) {
-                var re =  new RegExp('[А-ЯЁа-яёA-Za-z]+ [А-ЯЁа-яёA-Za-z]+ [А-ЯЁа-яёA-Za-z]+');
-                
-                return re.test(fio);
-            },
+        email: true,
 
-            email: function(email) {
-                var isValid = false;
+        phone: true,
 
-                var appropriateDomains = [
-                     'ya.ru',
-                     'yandex.ru',
-                     'yandex.ua',
-                     'yandex.by',
-                     'yandex.kz',
-                     'yandex.com'
-                ];
+        valid: function() {
+            return this.fio && this.email && this.phone;
+        }
+    };
 
-                var rePattern = '[A-Za-z0-9._%+-]+@';
-
-                try {
-                    appropriateDomains.forEach(function(domain) {
-                        var re = new RegExp(rePattern + domain);
-
-                        if (re.test(email)) {
-                            isValid = true;
-
-                            throw 'BreakException';
-                        }
-                    });
-                } catch (e) {
-                    if ( e !== 'BreakException') throw e;
-                }
-
-                return isValid;
-            },
-
-            phone: function(phone) {
-                var re = new RegExp(/^\+7\(\d{3}\)\d{3}-\d{2}-\d{2}$/);
-
-                if (!re.test(phone)) {
-                    return false;
-                } else {
-                    var sum = phone.match(/\d/g).reduce(function(a, b) {
-                        return Number(a) + Number(b);
-                    });
-
-                    return sum < 30;
-                }
-            },
-
-            all: function() {
-                ctrl.formValidStatus.fio = this.fio(ctrl.form.fio);
-
-                ctrl.formValidStatus.email = this.email(ctrl.form.email);
-
-                ctrl.formValidStatus.phone = this.phone(ctrl.form.phone);
-            }
-        };
-
-        var getRequest = function() {
-            // $log.debug('Rest is: ', rest);
-
-            ctrl.restMock = ctrl.randomRestMock();
+    ctrl.validate = {
+        fio: function(fio) {
+            var re =  /^\s*[А-ЯЁа-яёA-Za-z]+\s+[А-ЯЁа-яёA-Za-z]+\s+[А-ЯЁа-яёA-Za-z]+\s*$/;
             
-            $http.get(ctrl.restMock).then(function(res) {
-                if (res.data.status == 'success') {
-                    resultContainer.addClass('success');
+            return re.test(fio);
+        },
 
-                    resultContainer.html('Success');
-                }
+        email: function(email) {
+            var appropriateDomains = [
+                    'ya.ru',
+                    
+                    'yandex.ru',
+                    
+                    'yandex.ua',
+                    
+                    'yandex.by',
+                    
+                    'yandex.kz',
+                    
+                    'yandex.com'
+            ];
 
-                if (res.data.status == 'error') {
-                    resultContainer.addClass('success');
+            var rePattern = /^\s*[A-Za-z0-9._%+-]+@/;
 
-                    resultContainer.html(res.data.reason);
-                }
+            var reDomains = '(' + appropriateDomains.join('|') + ')\s*$';
 
-                if (res.data.status == 'progress') {
-                    resultContainer.addClass('progress');
+            var reEmail = new RegExp(rePattern.source + reDomains);
 
-                    setTimeout(function() {
-                        getRequest();
-                    }, res.data.timeout);
-                }
-            }, function(error) {
-                return $q.reject(error);
-            });
-        };
+            return reEmail.test(email);
+        },
 
-        ctrl.form = {
-            fio: 'Alex Alex Alex',
+        phone: function(phone) {
+           var re = /^\s*\+7\(\d{3}\)\d{3}-\d{2}-\d{2}\s*$/;
 
-            email: 'ya@ya.ru',
+            if (!re.test(phone)) {
+                return false;
+            } else {
+                var sum = phone.match(/\d/g).reduce(function(a, b) {
+                    return Number(a) + Number(b);
+                });
 
-            phone: '+7(211)212-12-12',
-
-            submit: function(e) {
-                e.preventDefault();
-                
-                $log.debug('Form has been submited.');
-
-                ctrl.validate.all();
-
-                if (!ctrl.formValidStatus.valid()) {
-                    $log.debug('Validation did not passed.');
-
-                    return;
-                } else {
-                    $log.debug('Validation passed.');
-
-                    getRequest();
-                }
+                return sum < 30;
             }
-        };
-    }]);
-})();
+        },
+
+        all: function() {
+            ctrl.formValidStatus.fio = this.fio(ctrl.form.fio);
+
+            ctrl.formValidStatus.email = this.email(ctrl.form.email);
+
+            ctrl.formValidStatus.phone = this.phone(ctrl.form.phone);
+        }
+    };
+
+    var getRequest = function() {
+        ctrl.restMock = ctrl.randomRestMock();
+        
+        $http.get(ctrl.restMock).then(function(res) {
+            if (res.data.status == 'success') {
+                resultContainer.addClass('success');
+
+                resultContainer.html('Success');
+            }
+
+            if (res.data.status == 'error') {
+                resultContainer.addClass('success');
+
+                resultContainer.html(res.data.reason);
+            }
+
+            if (res.data.status == 'progress') {
+                resultContainer.addClass('progress');
+
+                setTimeout(function() {
+                    getRequest();
+                }, res.data.timeout);
+            }
+        }, function(error) {
+            return $q.reject(error);
+        });
+    };
+
+    ctrl.form = {
+        fio: 'Alex Alex Alex',
+
+        email: 'ya@ya.ru',
+
+        phone: '+7(211)212-12-12',
+
+        submit: function(e) {
+            e.preventDefault();
+            
+            $log.debug('Form has been submited.');
+
+            ctrl.validate.all();
+
+            if (!ctrl.formValidStatus.valid()) {
+                $log.debug('Validation did not passed.');
+
+                return;
+            } else {
+                $log.debug('Validation passed.');
+
+                getRequest();
+            }
+        }
+    };
+}]);
