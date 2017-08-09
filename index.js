@@ -6,13 +6,11 @@ var MyForm = {
 };
 
 var app = angular.module('app', []);
-
-app.controller('AppController', ['$scope', '$log', '$http', '$q', function($scope, $log, $http, $q) {
+    
+app.controller('AppController', ['$log', '$http', '$q', function($log, $http, $q) {
     var ctrl = this;
 
     MyForm = ctrl.test;
-
-    var resultContainer = angular.element(document.getElementById('resultContainer'));
 
     var restMockArray = [
         'response-mocks/success.json',
@@ -21,6 +19,15 @@ app.controller('AppController', ['$scope', '$log', '$http', '$q', function($scop
         
         'response-mocks/progress.json'
     ];
+
+    var resultContainer = angular.element(document.getElementById('resultContainer'));
+        
+    ctrl.randomRestMock = function() {
+
+        // return random response mock
+        
+        return restMockArray[Math.floor(Math.random() * 3)];
+    };
 
     ctrl.restMock = '';
 
@@ -36,9 +43,11 @@ app.controller('AppController', ['$scope', '$log', '$http', '$q', function($scop
         email: true,
 
         phone: true,
-
+            
         valid: function() {
-            return this.fio && this.email && this.phone;
+            return this.fio
+                && this.email
+                && this.phone;
         }
     };
 
@@ -94,32 +103,34 @@ app.controller('AppController', ['$scope', '$log', '$http', '$q', function($scop
 
             ctrl.formValidStatus.phone = this.phone(ctrl.form.phone);
         }
-    };
+    };    
 
     var getRequest = function() {
         ctrl.restMock = ctrl.randomRestMock();
         
         $http.get(ctrl.restMock).then(function(res) {
-            if (res.data.status == 'success') {
-                resultContainer.addClass('success');
+                if (res.data.status == 'success') {
+                    resultContainer.addClass('success');
 
-                resultContainer.html('Success');
-            }
+                    resultContainer.html('Success');
+                }
 
-            if (res.data.status == 'error') {
-                resultContainer.addClass('success');
+                if (res.data.status == 'error') {
+                    resultContainer.addClass('success');
 
-                resultContainer.html(res.data.reason);
-            }
+                    resultContainer.html(res.data.reason);
+                }
 
-            if (res.data.status == 'progress') {
-                resultContainer.addClass('progress');
+                if (res.data.status == 'progress') {
+                    resultContainer.addClass('progress');
 
-                setTimeout(function() {
-                    getRequest();
-                }, res.data.timeout);
-            }
-        }, function(error) {
+                    resultContainer.html('');
+
+                    setTimeout(function() {
+                        getRequest();
+                    }, res.data.timeout);
+                }
+            }, function(error) {
             return $q.reject(error);
         });
     };
