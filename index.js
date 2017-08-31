@@ -7,35 +7,20 @@ var MyForm = {
 
 var app = angular.module('app', []);
     
-app.controller('AppController', ['$log', '$http', '$q', function($log, $http, $q) {
+app.controller('AppController', ['$log', '$http', '$q', '$scope', function($log, $http, $q, $scope) {
     var ctrl = this;
 
-    MyForm = ctrl.test;
-
     var restMockArray = [
-        'response-mocks/success.json',
+        'success.json',
         
-        'response-mocks/error.json',
+        'error.json',
         
-        'response-mocks/progress.json'
+        'progress.json'
     ];
 
+    ctrl.rest = restMockArray[0];
+
     var resultContainer = angular.element(document.getElementById('resultContainer'));
-        
-    ctrl.randomRestMock = function() {
-
-        // return random response mock
-        
-        return restMockArray[Math.floor(Math.random() * 3)];
-    };
-
-    ctrl.restMock = '';
-
-    ctrl.randomRestMock = function() {
-
-        // return random response mock
-        return restMockArray[Math.floor(Math.random() * 3)];
-    };
 
     ctrl.formValidStatus = {
         fio: true,
@@ -52,6 +37,8 @@ app.controller('AppController', ['$log', '$http', '$q', function($log, $http, $q
     };
 
     ctrl.validate = {
+        invalidFields: [],
+
         fio: function(fio) {
             var re =  /^\s*[А-ЯЁа-яёA-Za-z]+\s+[А-ЯЁа-яёA-Za-z]+\s+[А-ЯЁа-яёA-Za-z]+\s*$/;
             
@@ -97,18 +84,32 @@ app.controller('AppController', ['$log', '$http', '$q', function($log, $http, $q
         },
 
         all: function() {
+            ctrl.validate.invalidFields = [];
+
             ctrl.formValidStatus.fio = this.fio(ctrl.form.fio);
+
+            if (!ctrl.formValidStatus.fio) {
+                ctrl.validate.invalidFields.push('fio');
+            }
 
             ctrl.formValidStatus.email = this.email(ctrl.form.email);
 
+            if (!ctrl.formValidStatus.email) {
+                ctrl.validate.invalidFields.push('email');
+            }
+
             ctrl.formValidStatus.phone = this.phone(ctrl.form.phone);
+
+            if (!ctrl.formValidStatus.phone) {
+                ctrl.validate.invalidFields.push('phone');
+            }
         }
     };    
 
     var getRequest = function() {
-        ctrl.restMock = ctrl.randomRestMock();
+        // ctrl.restMock = ctrl.randomRestMock();
         
-        $http.get(ctrl.restMock).then(function(res) {
+        $http.get(ctrl.rest).then(function(res) {
                 if (res.data.status == 'success') {
                     resultContainer.addClass('success');
 
@@ -143,7 +144,7 @@ app.controller('AppController', ['$log', '$http', '$q', function($log, $http, $q
         phone: '+7(211)212-12-12',
 
         submit: function(e) {
-            e.preventDefault();
+            if (e) e.preventDefault();
             
             $log.debug('Form has been submited.');
 
@@ -160,4 +161,46 @@ app.controller('AppController', ['$log', '$http', '$q', function($log, $http, $q
             }
         }
     };
+
+    MyForm.validate = function() {
+        var result = {};
+
+        ctrl.validate.all();
+
+        result.isValid = ctrl.formValidStatus.valid();
+
+        result.errorFields = ctrl.validate.invalidFields;
+
+        return result;
+    };
+
+    MyForm.getData = function() {
+        var result = {
+            fio: ctrl.form.fio,
+
+            email: ctrl.form.email,
+
+            phone: ctrl.form.phone
+        };
+        
+        return result;
+    };
+
+    MyForm.setData = function(data) {
+        if (data.fio !== undefined) {
+            ctrl.form.fio = data.fio;
+        }
+
+        if (data.email !== undefined) {
+            ctrl.form.email = data.email;
+        }
+
+        if (data.phone !== undefined) {
+            ctrl.form.phone = data.phone;
+        }
+
+        $scope.$digest();
+    };
+
+    MyForm.submit = ctrl.form.submit;
 }]);
